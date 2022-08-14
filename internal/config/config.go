@@ -10,8 +10,9 @@ import (
 
 // Query represents a single query in a group in the configuration.
 type Query struct {
-	Expr  string `yaml:"expr"`
-	Topic string `yaml:"topic"`
+	Expr          string `yaml:"expr"`
+	Topic         string `yaml:"topic"`
+	DecimalPlaces *int   `yaml:"decimal_places"`
 }
 
 // Group represents a set of queries which will be run at a fixed interval.
