@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -30,7 +31,7 @@ func StartRunner(mqttBroker string, v1api v1.API, group *config.Group) {
 	runner.group = group
 	runner.v1api = v1api
 
-	opts := mqtt.NewClientOptions().AddBroker(mqttBroker).SetClientID("prom2mqtt")
+	opts := mqtt.NewClientOptions().AddBroker(mqttBroker).SetClientID(fmt.Sprintf("prom2mqtt-%d", time.Now().UnixMilli()))
 	opts.SetKeepAlive(2 * time.Second)
 	// opts.SetDefaultPublishHandler(f)
 	opts.SetPingTimeout(1 * time.Second)
@@ -103,5 +104,11 @@ func (c *Runner) resultToPayload(query *config.Query, result model.Value) (strin
 		log.Printf("more than one value, selecting the first")
 	}
 
-	return fmt.Sprintf("%f", vec[0].Value), nil
+	f := float64(vec[0].Value)
+
+	if query.DecimalPlaces != nil {
+		return strconv.FormatFloat(f, 'f', *query.DecimalPlaces, 64), nil
+	}
+
+	return fmt.Sprintf("%f", f), nil
 }

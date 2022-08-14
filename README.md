@@ -43,14 +43,17 @@ groups:
       # to the weather/rain_1h topic
       - topic: weather/rain_1h
         expr: sum(increase(weather_station_rain_mm[1h]))
+        decimal_places: 1
 
       # Publish the rain amount of rain over the 24 hours
       # to the weather/rain_24h topic
       - topic: weather/rain_24h
         expr: sum(increase(weather_station_rain_mm[24h]))
+        decimal_places: 1
 
       # Publish a boolean 0/1 value which signals whether it's
       # rained in the past 30m to the weather/rained_last_30m topic
       - topic: weather/rained_last_30m
         expr: sum(increase(weather_station_rain_mm[30m])) > bool 0
+        decimal_places: 0
 ```
