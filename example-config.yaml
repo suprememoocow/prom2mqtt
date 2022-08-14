@@ -1,0 +1,29 @@
+groups:
+  - name: weather_station
+    interval: 1m
+    queries:
+      - topic: 'avitrack/rain_1h'
+        expr: round(sum(increase(avitrack_rain_mm[1h])))
+      - topic: 'avitrack/rained_last_30m'
+        expr: sum(increase(avitrack_rain_mm[30m])) > bool 0
+      - topic: 'avitrack/rain_24h'
+        expr: round(sum(increase(avitrack_rain_mm[24h])))
+      # Air Pressure must be in the range 700 to 1100 hPa.
+      - topic: 'avitrack/air_pressure_mbar'
+        expr: clamp_max(clamp_min(round(avg(avitrack_atmospheric_pressure_mbar)), 700), 1100)
+      - topic: 'avitrack/wind_direction_deg'
+        expr: avitrack_wind_direction_deg
+      - topic: 'avitrack/avg_wind_speed_kmh'
+        expr: round(avg(avitrack_avg_wind_speed_kmh) * 10) / 10
+      # Current temperature must be in the range 0 to 100 degrees Celsius to a maximum of 1dp.
+      - topic: 'avitrack/temperature_celsius'
+        expr: |
+          clamp_max(clamp_min(
+            round(avg(avitrack_temperature_celsius) * 10) / 10,
+          0), 100)
+      # Current relative humidity must be in the range 0 to 100 percent with no decimal places.
+      - topic: 'avitrack/relative_humidity'
+        expr: |
+          clamp_max(clamp_min(
+            round(avg(avitrack_relative_humidity * 100)),
+          0), 100)
